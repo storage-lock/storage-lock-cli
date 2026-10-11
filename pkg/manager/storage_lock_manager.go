@@ -3,12 +3,20 @@ package manager
 import (
 	"context"
 	message_channel "github.com/golang-infrastructure/go-message-channel"
-	"github.com/storage-lock/go-storage-lock/pkg/storage"
-	"github.com/storage-lock/go-storage-lock/pkg/storage_lock"
+	"github.com/storage-lock/go-storage"
+	storage_lock "github.com/storage-lock/go-storage-lock"
 )
 
+// NOTE: 本文件曾引用 `github.com/storage-lock/go-storage-lock/pkg/storage` 与
+// `.../pkg/storage_lock`——那是 2023 年中之前单体仓库时代的旧内部路径，存储拆分为
+// 独立仓库（go-storage / go-*-storage）后已不存在。按现行 API 重写：storage 相关类型
+// 来自 go-storage，锁操作经 storage_lock.NewStorageLock(storage, lockId) 构造。
 type StorageLockManager struct {
 	storage storage.Storage
+}
+
+func NewStorageLockManager(s storage.Storage) *StorageLockManager {
+	return &StorageLockManager{storage: s}
 }
 
 // List 列出当前的所有锁
@@ -30,11 +38,14 @@ func (x *StorageLockManager) Delete(ctx context.Context, lockId string) error {
 	if err != nil {
 		return err
 	}
-	lockInformation, err := storage.FromJsonString(get)
+	lockInformation, err := storage.LockInformationFromJsonString(get)
+	if err != nil {
+		return err
+	}
 	return x.storage.DeleteWithVersion(ctx, lockId, lockInformation.Version, lockInformation)
 }
 
-func (x *StorageLockManager) Clear(ctx context.Context, channel message_channel.Channel[*storage.LockInformation]) error {
+func (x *StorageLockManager) Clear(ctx context.Context, channel *message_channel.Channel[*storage.LockInformation]) error {
 	list, err := x.storage.List(ctx)
 	if err != nil {
 		return err
@@ -51,18 +62,20 @@ func (x *StorageLockManager) Clear(ctx context.Context, channel message_channel.
 }
 
 func (x *StorageLockManager) Lock(ctx context.Context, lockId, ownerId string) error {
-
+	lock, err := storage_lock.NewStorageLock(x.storage, lockId)
+	if err != nil {
+		return err
+	}
+	return lock.Lock(ctx, ownerId)
 }
 
 // Unlock 使用给定的ownerId尝试解锁
 func (x *StorageLockManager) Unlock(ctx context.Context, lockId, ownerId string) error {
-	lockInformation, err := x.Find(ctx, lockId)
+	lock, err := storage_lock.NewStorageLock(x.storage, lockId)
 	if err != nil {
 		return err
 	}
-	lock := storage_lock.NewStorageLock(x.storage)
-	lock.UnLock()
-	
+	return lock.UnLock(ctx, ownerId)
 }
 
 // Find 查询给定的锁的信息
@@ -71,5 +84,5 @@ func (x *StorageLockManager) Find(ctx context.Context, lockId string) (*storage.
 	if err != nil {
 		return nil, err
 	}
-	return storage.FromJsonString(jsonString)
+	return storage.LockInformationFromJsonString(jsonString)
 }

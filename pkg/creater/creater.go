@@ -3,15 +3,16 @@ package creater
 import (
 	"context"
 	"fmt"
-	"github.com/storage-lock/go-storage-lock/pkg/storage"
-	"github.com/storage-lock/go-storage-lock/pkg/storage/mariadb_storage"
-	"github.com/storage-lock/go-storage-lock/pkg/storage/mongodb_storage"
-	"github.com/storage-lock/go-storage-lock/pkg/storage/mysql_storage"
-	"github.com/storage-lock/go-storage-lock/pkg/storage/postgresql_storage"
-	"github.com/storage-lock/go-storage-lock/pkg/storage/sql_server_storage"
-	"github.com/storage-lock/go-storage-lock/pkg/storage/tidb_storage"
 	"sort"
 	"strings"
+
+	mariadb_storage "github.com/storage-lock/go-mariadb-storage"
+	mongodb_storage "github.com/storage-lock/go-mongodb-storage"
+	mysql_storage "github.com/storage-lock/go-mysql-storage"
+	postgresql_storage "github.com/storage-lock/go-postgresql-storage"
+	sqlserver_storage "github.com/storage-lock/go-sqlserver-storage"
+	"github.com/storage-lock/go-storage"
+	tidb_storage "github.com/storage-lock/go-tidb-storage"
 )
 
 // StorageCreateFunc 用来创建Storage的函数
@@ -20,60 +21,71 @@ type StorageCreateFunc func(ctx context.Context, dsn string) (storage.Storage, e
 // 对于内置的Storage的支持
 var storageCreateMap map[string]StorageCreateFunc = make(map[string]StorageCreateFunc)
 
+// NOTE: 本文件曾引用 `github.com/storage-lock/go-storage-lock/pkg/storage/...` 下的
+// mariadb/mysql/mongodb/postgresql/sql_server/tidb_storage 包——那是 2023 年中之前
+// go-storage-lock 单体仓库时代的旧内部路径，各存储拆分为独立仓库（go-*-storage）后
+// 已彻底不存在。本次按现行各独立仓库的构造器重写，逐个对照过各仓库导出的
+// NewXxxStorage(ctx, options)/NewXxxConnectionManagerFromDsn(dsn) 签名。
 func init() {
 
 	// mariadb_storage
-	mariadbStorage, _ := mariadb_storage.NewMariaDbStorage(nil, nil)
-	storageCreateMap[strings.ToLower(mariadbStorage.GetName())] = func(ctx context.Context, dsn string) (storage.Storage, error) {
-		connectionProvider := mariadb_storage.NewMariaStorageConnectionProviderFromDSN(dsn)
-		options := mariadb_storage.NewMariaStorageOptions()
-		options.WithConnectionProvider(connectionProvider)
-		return mariadb_storage.NewMariaDbStorage(ctx, options)
+	mariadbStorage, _ := mariadb_storage.NewMariadbStorage(context.Background(), mariadb_storage.NewMariadbStorageOptions())
+	if mariadbStorage != nil {
+		storageCreateMap[strings.ToLower(mariadbStorage.GetName())] = func(ctx context.Context, dsn string) (storage.Storage, error) {
+			connectionManager := mariadb_storage.NewMariadbConnectionManagerFromDsn(dsn)
+			options := mariadb_storage.NewMariadbStorageOptions().SetConnectionManager(connectionManager)
+			return mariadb_storage.NewMariadbStorage(ctx, options)
+		}
 	}
 
 	// tidb_storage
-	tidbStorage, _ := tidb_storage.NewTidbStorage(nil, nil)
-	storageCreateMap[strings.ToLower(tidbStorage.GetName())] = func(ctx context.Context, dsn string) (storage.Storage, error) {
-		connectionProvider := tidb_storage.NewTidbConnectionProviderFromDSN(dsn)
-		options := tidb_storage.NewTidbStorageOptions()
-		options.WithConnectionProvider(connectionProvider)
-		return tidb_storage.NewTidbStorage(ctx, options)
+	tidbStorage, _ := tidb_storage.NewTidbStorage(context.Background(), tidb_storage.NewTidbStorageOptions())
+	if tidbStorage != nil {
+		storageCreateMap[strings.ToLower(tidbStorage.GetName())] = func(ctx context.Context, dsn string) (storage.Storage, error) {
+			connectionManager := tidb_storage.NewTidbConnectionManagerFromDsn(dsn)
+			options := tidb_storage.NewTidbStorageOptions().SetConnectionManager(connectionManager)
+			return tidb_storage.NewTidbStorage(ctx, options)
+		}
 	}
 
 	// mysql_storage
-	mysqlStorage, _ := mysql_storage.NewMySQLStorage(nil, nil)
-	storageCreateMap[strings.ToLower(mysqlStorage.GetName())] = func(ctx context.Context, dsn string) (storage.Storage, error) {
-		connectionProvider := mysql_storage.NewMySQLConnectionProviderFromDSN(dsn)
-		options := mysql_storage.NewMySQLStorageOptions()
-		options.WithConnectionProvider(connectionProvider)
-		return mysql_storage.NewMySQLStorage(ctx, options)
+	mysqlStorage, _ := mysql_storage.NewMysqlStorage(context.Background(), mysql_storage.NewMysqlStorageOptions())
+	if mysqlStorage != nil {
+		storageCreateMap[strings.ToLower(mysqlStorage.GetName())] = func(ctx context.Context, dsn string) (storage.Storage, error) {
+			connectionManager := mysql_storage.NewMysqlConnectionManagerFromDsn(dsn)
+			options := mysql_storage.NewMysqlStorageOptions().SetConnectionManager(connectionManager)
+			return mysql_storage.NewMysqlStorage(ctx, options)
+		}
 	}
 
 	// mongodb_storage
-	mongoStorage, _ := mongodb_storage.NewMongoStorage(nil, nil)
-	storageCreateMap[strings.ToLower(mongoStorage.GetName())] = func(ctx context.Context, dsn string) (storage.Storage, error) {
-		connectionProvider := mongodb_storage.NewMongoConnectionProvider(dsn)
-		options := mongodb_storage.NewMongoStorageOptions()
-		options.WithConnectionProvider(connectionProvider)
-		return mongodb_storage.NewMongoStorage(ctx, options)
+	mongoStorage, _ := mongodb_storage.NewMongoStorage(context.Background(), mongodb_storage.NewMongoStorageOptions())
+	if mongoStorage != nil {
+		storageCreateMap[strings.ToLower(mongoStorage.GetName())] = func(ctx context.Context, dsn string) (storage.Storage, error) {
+			connectionManager := mongodb_storage.NewMongoConnectionManagerFromURI(dsn)
+			options := mongodb_storage.NewMongoStorageOptions().SetConnectionManager(connectionManager)
+			return mongodb_storage.NewMongoStorage(ctx, options)
+		}
 	}
 
 	// postgresql_storage
-	postgresqlStorage, _ := postgresql_storage.NewPostgreSQLStorage(nil, nil)
-	storageCreateMap[strings.ToLower(postgresqlStorage.GetName())] = func(ctx context.Context, dsn string) (storage.Storage, error) {
-		connectionProvider := postgresql_storage.NewPostgreSQLConnectionGetterFromDSN(dsn)
-		options := &postgresql_storage.PostgreSQLStorageOptions{}
-		options.ConnectionProvider = connectionProvider
-		return postgresql_storage.NewPostgreSQLStorage(ctx, options)
+	postgresqlStorage, _ := postgresql_storage.NewPostgresqlStorage(context.Background(), postgresql_storage.NewPostgresqlStorageOptions())
+	if postgresqlStorage != nil {
+		storageCreateMap[strings.ToLower(postgresqlStorage.GetName())] = func(ctx context.Context, dsn string) (storage.Storage, error) {
+			connectionManager := postgresql_storage.NewPostgresqlConnectionGetterFromDsn(dsn)
+			options := postgresql_storage.NewPostgresqlStorageOptions().SetConnectionManager(connectionManager)
+			return postgresql_storage.NewPostgresqlStorage(ctx, options)
+		}
 	}
 
-	// sql_server_storage
-	sqlServerStorage, _ := sql_server_storage.NewSqlServerStorage(nil, nil)
-	storageCreateMap[strings.ToLower(sqlServerStorage.GetName())] = func(ctx context.Context, dsn string) (storage.Storage, error) {
-		connectionProvider := sql_server_storage.NewSqlServerStorageConnectionGetterFromDSN(dsn)
-		options := sql_server_storage.NewSqlServerStorageOptions()
-		options.WithConnectionProvider(connectionProvider)
-		return sql_server_storage.NewSqlServerStorage(ctx, options)
+	// sqlserver_storage
+	sqlServerStorage, _ := sqlserver_storage.NewSqlServerStorage(context.Background(), sqlserver_storage.NewSqlServerStorageOptions())
+	if sqlServerStorage != nil {
+		storageCreateMap[strings.ToLower(sqlServerStorage.GetName())] = func(ctx context.Context, dsn string) (storage.Storage, error) {
+			connectionManager := sqlserver_storage.NewSqlServerConnectionManagerFromDsn(dsn)
+			options := sqlserver_storage.NewSqlServerStorageOptions().SetConnectionManager(connectionManager)
+			return sqlserver_storage.NewSqlServerStorage(ctx, options)
+		}
 	}
 
 }
@@ -90,6 +102,7 @@ func ListSupportStorageName() []string {
 
 // CreateStorage 根据名称和DSN创建Storage
 func CreateStorage(storageName string, dsn string) (storage.Storage, error) {
+	storageName = strings.ToLower(strings.TrimSpace(storageName))
 	createFunc, exists := storageCreateMap[storageName]
 	if !exists {
 		return nil, fmt.Errorf("Storage %s does not exist", storageName)

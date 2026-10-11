@@ -2,36 +2,22 @@ package cmd
 
 import (
 	"context"
-	"github.com/fatih/color"
-	message_channel "github.com/golang-infrastructure/go-message-channel"
+	"errors"
+
 	"github.com/spf13/cobra"
-	"github.com/storage-lock/storage-lock-cli/pkg/manager"
 )
 
-func init() {
-	rootCmd.AddCommand(clearCmd)
-}
+func init() { rootCmd.AddCommand(clearCmd) }
 
 var clearCmd = &cobra.Command{
 	Use:   "clear",
-	Short: "clear all locks",
-	Long:  ``,
+	Short: "disabled: physical deletion would destroy fencing history",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		return Clear(cmd.Context())
+		return errors.New("clearing lock records is unsupported; release leases and retain tombstones")
 	},
 }
 
-func Clear(ctx context.Context) error {
-	color.HiGreen("version %s", Version)
-}
-
-func EnsureClear(ctx context.Context) bool {
-	lockManager := manager.StorageLockManager{}
-	options := message_channel.NewChannelOptions()
-	channel := message_channel.NewChannel(options)
-	lockManager.Clear(ctx, channel)
-}
-
-func DoClear(ctx context.Context) error {
-
-}
+// 保留旧导出名，但不再执行危险的物理清理。
+func Clear(context.Context) error       { return errors.New("clearing lock records is unsupported") }
+func EnsureClear(context.Context) bool  { return false }
+func DoClear(ctx context.Context) error { return Clear(ctx) }
