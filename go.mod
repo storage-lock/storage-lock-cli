@@ -9,7 +9,7 @@ require (
 	github.com/ivanpirog/coloredcobra v1.0.1
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/spf13/cobra v1.7.0
-	github.com/storage-lock/go-mariadb-storage v0.0.0-20260630205327-f01c5fbdd184
+	github.com/storage-lock/go-mariadb-storage v0.0.2
 	github.com/storage-lock/go-mongodb-storage v0.0.1
 	github.com/storage-lock/go-mysql-storage v0.0.3
 	github.com/storage-lock/go-postgresql-storage v0.0.3
@@ -57,5 +57,3 @@ require (
 	golang.org/x/text v0.13.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
-
-replace github.com/storage-lock/go-mariadb-storage => ../go-mariadb-storage
