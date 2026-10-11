@@ -5,17 +5,18 @@ go 1.23
 require (
 	github.com/fatih/color v1.15.0
 	github.com/golang-infrastructure/go-message-channel v0.0.0-20230310152217-2633ccd80801
+	github.com/google/uuid v1.6.0
 	github.com/ivanpirog/coloredcobra v1.0.1
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/spf13/cobra v1.7.0
 	github.com/storage-lock/go-mariadb-storage v0.0.0-20260630205327-f01c5fbdd184
-	github.com/storage-lock/go-mongodb-storage v0.0.0-20260703103257-0a757b8a13c3
-	github.com/storage-lock/go-mysql-storage v0.0.3-0.20230923200627-de392591593c
-	github.com/storage-lock/go-postgresql-storage v0.0.2
-	github.com/storage-lock/go-sqlserver-storage v0.0.1
-	github.com/storage-lock/go-storage v0.0.2
-	github.com/storage-lock/go-storage-lock v0.0.5
-	github.com/storage-lock/go-tidb-storage v0.0.1
+	github.com/storage-lock/go-mongodb-storage v0.0.1
+	github.com/storage-lock/go-mysql-storage v0.0.3
+	github.com/storage-lock/go-postgresql-storage v0.0.3
+	github.com/storage-lock/go-sqlserver-storage v0.0.2
+	github.com/storage-lock/go-storage v0.0.3
+	github.com/storage-lock/go-storage-lock v0.0.6
+	github.com/storage-lock/go-tidb-storage v0.0.2
 )
 
 require (
@@ -30,7 +31,6 @@ require (
 	github.com/golang-sql/civil v0.0.0-20220223132316-b832511892a9 // indirect
 	github.com/golang-sql/sqlexp v0.1.0 // indirect
 	github.com/golang/snappy v0.0.4 // indirect
-	github.com/google/uuid v1.6.0 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/klauspost/compress v1.16.7 // indirect
 	github.com/lib/pq v1.10.9 // indirect
@@ -39,10 +39,10 @@ require (
 	github.com/montanaflynn/stats v0.7.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
-	github.com/storage-lock/go-events v0.0.3 // indirect
-	github.com/storage-lock/go-ntp-time-provider v0.0.1 // indirect
-	github.com/storage-lock/go-sql-based-storage v0.0.0-20230903181730-3e91a672a521 // indirect
-	github.com/storage-lock/go-storage-events v0.0.5 // indirect
+	github.com/storage-lock/go-events v0.0.4 // indirect
+	github.com/storage-lock/go-ntp-time-provider v0.0.3 // indirect
+	github.com/storage-lock/go-sql-based-storage v0.0.2 // indirect
+	github.com/storage-lock/go-storage-events v0.0.6 // indirect
 	github.com/storage-lock/go-utils v0.0.2 // indirect
 	github.com/stretchr/testify v1.11.1 // indirect
 	github.com/xdg-go/pbkdf2 v1.0.0 // indirect
@@ -58,20 +58,4 @@ require (
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
 
-replace github.com/storage-lock/go-storage-lock => ../go-storage-lock
-
-replace github.com/storage-lock/go-storage => ../go-storage
-
 replace github.com/storage-lock/go-mariadb-storage => ../go-mariadb-storage
-
-replace github.com/storage-lock/go-mongodb-storage => ../go-mongodb-storage
-
-replace github.com/storage-lock/go-mysql-storage => ../go-mysql-storage
-
-replace github.com/storage-lock/go-postgresql-storage => ../go-postgresql-storage
-
-replace github.com/storage-lock/go-sqlserver-storage => ../go-sqlserver-storage
-
-replace github.com/storage-lock/go-tidb-storage => ../go-tidb-storage
-
-replace github.com/storage-lock/go-sql-based-storage => ../go-sql-based-storage
