@@ -51,15 +51,28 @@ busy=$(grep -l '"status":"busy"' "$TMP"/l2-*.json 2>/dev/null | wc -l)
 check_eq "并发持有数" "$held" "1"
 check_eq "并发竞争失败数" "$busy" "9"
 
-echo "== 3. 5 进程并发选主，只应 1 个 leader"
+echo "== 3a. 领导权持有时，其他人竞选必须是 follower（真互斥）"
+run leader-election --id="$NS/e1" --ttl=12s --owner=holder --hold=4s >"$TMP/e1-holder.json" 2>&1 &
+holder_pid=$!
+sleep 1
+out=$(run leader-election --id="$NS/e1" --ttl=12s --owner=challenger 2>&1)
+check_contains "持有期间挑战者被拒" "$out" '"status":"follower"'
+wait "$holder_pid"
+out=$(run leader-election --id="$NS/e1" --ttl=12s --owner=challenger 2>&1)
+check_contains "让出后挑战者当选" "$out" '"status":"leader"'
+
+# one-shot 竞选拿到后立即让出，因此并发调用可能"接力"式地先后都报 leader。
+# 这不是双持有：栅栏令牌必须互不相同（后一个严格更大），否则说明 CAS 失效。
+echo "== 3b. one-shot 并发竞选：令牌互不相同，不存在双成功"
 for i in $(seq 1 5); do
-  run leader-election --id="$NS/e1" --ttl=12s --owner="c$i" >"$TMP/e1-$i.json" 2>&1 &
+  run leader-election --id="$NS/e2" --ttl=12s --owner="d$i" >"$TMP/e2-$i.json" 2>&1 &
 done
 wait
-leaders=$(grep -l '"status":"leader"' "$TMP"/e1-*.json 2>/dev/null | wc -l)
-followers=$(grep -l '"status":"follower"' "$TMP"/e1-*.json 2>/dev/null | wc -l)
-check_eq "leader 数量" "$leaders" "1"
-check_eq "follower 数量" "$followers" "4"
+tokens=$(grep -h '"status":"leader"' "$TMP"/e2-*.json 2>/dev/null | grep -o '"fencing_token":[0-9]*' | cut -d: -f2 | sort -n)
+unique_tokens=$(printf '%s\n' "$tokens" | grep -c . )
+distinct_tokens=$(printf '%s\n' "$tokens" | sort -u | grep -c .)
+check_eq "leader 令牌互不相同" "$distinct_tokens" "$unique_tokens"
+check_contains "至少产生 1 个 leader" "$(cat "$TMP"/e2-*.json)" '"status":"leader"'
 
 echo "== 4. 信号量 capacity=2：2 个持有者占满后第 3 个被拒"
 run semaphore --id="$NS/s1" --capacity=2 --ttl=10s --owner=h1 --hold=4s >"$TMP/s1-a.json" 2>&1 &

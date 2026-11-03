@@ -85,7 +85,7 @@ CLI=storage-lock-cli ./skills/smoke-test.sh
 | `with-lock` | `executed` | 子进程退出 0，锁已释放 |
 | | `child_exited` | 子进程非 0 退出，CLI 透传子进程退出码 |
 | | `interrupted` | 收到 SIGINT/SIGTERM |
-| `leader-election` | `leader` / `follower` / `lost` | 竞选结果 |
+| `leader-election` | `leader` / `follower` / `lost` | 竞选结果（不带 `--hold` 时是"试探"，当选后立即让出，并发调用可能接力式先后当选；带 `--hold` 时排队等待并保持领导权） |
 | `semaphore` | `permit_acquired` / `no_permit` / `held` / `lost` | permit 结果 |
 | `semaphore-release` | `released` / `release_failed` | 归还结果（幂等） |
 
