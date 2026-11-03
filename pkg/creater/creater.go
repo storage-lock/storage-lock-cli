@@ -67,6 +67,11 @@ func init() {
 		options := sqlserver_storage.NewSqlServerStorageOptions().SetConnectionManager(connectionManager)
 		return sqlserver_storage.NewSqlServerStorage(ctx, options)
 	})
+	// sql-server-storage 的 StorageName 包含连字符，去掉 "-storage" 后是 "sql-server"。
+	// 但用户习惯用 "sqlserver"（无连字符），额外注册别名兼容。
+	if fn, ok := storageCreateMap["sql-server-storage"]; ok {
+		storageCreateMap["sqlserver"] = fn
+	}
 }
 
 // register 登记一个存储实现，同时接受全名和去掉 "-storage" 后缀的简称，

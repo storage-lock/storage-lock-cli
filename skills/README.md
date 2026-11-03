@@ -62,12 +62,13 @@ CLI=storage-lock-cli ./skills/smoke-test.sh
 | 后端 | 示例 DSN |
 | --- | --- |
 | `redis` | `redis://127.0.0.1:6379/0` |
-| `mariadb` | `root:rootpass@tcp(127.0.0.1:13306)/storage_lock_test` |
+| `mariadb` | `root:rootpass@tcp(127.0.0.1:13309)/storage_lock_test` |
 | `mysql` | `root:rootpass@tcp(127.0.0.1:3306)/storage_lock_test` |
 | `postgresql` | `postgres://postgres:pgpass@127.0.0.1:5432/storage_lock_test?sslmode=disable` |
 | `mongodb` | `mongodb://127.0.0.1:27017/storage_lock_test` |
+| `tidb` | `root:@tcp(127.0.0.1:14000)/storage_lock_test` |
 
-另有 `tidb`、`sql-server` 已注册但未做端到端验证。选后端只看两点：**并发下 CAS 必须原子**、**能给出统一的当前时间**——这正是不支持 CAS 的存储（如 ClickHouse）不能用于 Agent 协作的原因。
+另有 `sql-server` 已注册但**暂不可用**：`go-sqlserver-storage` 直接复用 `Sql92Provider`，其 SQL 用 `?` 占位符，但 mssql 驱动不支持 `?`（需命名参数 `@p1`、`@p2`），需该仓实现专用 Provider 后才能验证。选后端只看两点：**并发下 CAS 必须原子**、**能给出统一的当前时间**——这正是不支持 CAS 的存储（如 ClickHouse）不能用于 Agent 协作的原因。
 
 **所有参与协作的 Agent 必须使用相同的 `--storage` 和 `--dsn`**，否则它们看到的不是同一套锁。
 
