@@ -81,12 +81,28 @@ wait "$wl_pid"
 out=$(run status --id="$NS/w1" 2>&1)
 check_contains "任务结束后锁已释放" "$out" '"status":"free"'
 
-set +e
 run with-lock --id="$NS/w2" --ttl=5s -- sh -c 'exit 7' >"$TMP/w2.json" 2>&1
 code=$?
-set -e
 check_eq "子进程退出码透传" "$code" "7"
 check_contains "child_exited 状态" "$(cat "$TMP/w2.json")" '"status":"child_exited"'
+
+echo "== 6. 租约到期后其他 Agent 可自动接管（无需人工清理）"
+run lock --id="$NS/l3" --ttl=3s --owner=dead >/dev/null 2>&1
+out=$(run lock --id="$NS/l3" --ttl=10s --owner=next 2>&1)
+check_contains "到期前被拒" "$out" '"status":"busy"'
+sleep 4
+out=$(run lock --id="$NS/l3" --ttl=10s --owner=next 2>&1)
+check_contains "到期后可接管" "$out" '"status":"held"'
+
+echo "== 7. 看门狗长跑：ttl=3s 的任务持续 8s 期间不被抢占"
+run with-lock --id="$NS/w3" --ttl=3s --owner=soak -- sh -c 'sleep 8' >"$TMP/w3.json" 2>&1 &
+soak_pid=$!
+sleep 5
+out=$(run lock --id="$NS/w3" --ttl=10s --owner=intruder 2>&1)
+check_contains "看门狗持续续租，5s 时仍被持有" "$out" '"status":"busy"'
+wait "$soak_pid"
+out=$(run status --id="$NS/w3" 2>&1)
+check_contains "长跑结束后已释放" "$out" '"status":"free"'
 
 echo
 echo "结果: PASS=$pass FAIL=$fail"
