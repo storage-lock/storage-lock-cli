@@ -3,6 +3,7 @@ package cmd
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"os"
 	"strings"
@@ -76,12 +77,24 @@ func Execute() {
 	cc.Init(&cc.Config{RootCmd: rootCmd, Headings: cc.HiCyan + cc.Bold + cc.Underline, Commands: cc.HiYellow + cc.Bold, Example: cc.Italic, ExecName: cc.Bold, Flags: cc.Bold})
 	rootCmd.SetOut(color.Output)
 	if err := rootCmd.Execute(); err != nil {
+		var code exitCodeError
+		if errors.As(err, &code) {
+			// with-lock 之类需要把子进程退出码透传给调用方的场景。
+			// 结果 JSON 已经输出，这里不再重复打印 "exit status N"。
+			closeRootStorage()
+			os.Exit(code.code)
+		}
 		_, _ = fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
 }
 
 func init() {
+	// 出错时只打印一行错误，不打印整段 Usage：skills 命令的输出要能被 Agent 直接解析，
+	// 而人工排障时 Usage 也只是噪音（--help 依旧完整可用）。
+	rootCmd.SilenceUsage = true
+	rootCmd.SilenceErrors = true
+
 	rootCmd.PersistentFlags().StringVar(&storageName, "storage", "", "storage implementation name")
 	rootCmd.PersistentFlags().StringVar(&dsn, "dsn", "", "storage DSN or connection URI")
 	rootCmd.PersistentFlags().DurationVar(&timeout, "timeout", 30*time.Second, "command timeout")

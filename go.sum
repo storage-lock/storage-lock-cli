@@ -83,6 +83,8 @@ github.com/storage-lock/go-events v0.0.5 h1:V8R4wYQ0q7KWZ2cfIdgctMhNY8Uiwgt0a1N3
 github.com/storage-lock/go-events v0.0.5/go.mod h1:eJtZJlcZEKJgDDzuLw+rCrdy3vImJZGQ6gsb55OOcZ4=
 github.com/storage-lock/go-mariadb-storage v0.0.2 h1:WlhahK33QOA4xxXyZ6Bt629BCpc2neygQr6YynuXlTQ=
 github.com/storage-lock/go-mariadb-storage v0.0.2/go.mod h1:kjLtL+FzHkg0TNAVYtTrTXsN09Axu6uxYKjx0X0lloM=
+github.com/storage-lock/go-memory-storage v0.0.1 h1:g2tkrMv0BKZK52fjrJgktqBGLNx7PXFWQwMAQDq65GA=
+github.com/storage-lock/go-memory-storage v0.0.1/go.mod h1:4sxMU46piuA1jfAKmkM6y2v4n3+SNqhIIYeq3U0IrKo=
 github.com/storage-lock/go-mongodb-storage v0.0.1 h1:WMDrrDSEXdhMK/XE5hnxy6a9KvB9SPVH8SzqW3i+cDs=
 github.com/storage-lock/go-mongodb-storage v0.0.1/go.mod h1:znUCkTl6BL5HCrQhr/Nz5w8KEI2LYpgT2Cmto5FGtZs=
 github.com/storage-lock/go-mysql-storage v0.0.3 h1:/Iw0Y57SEErzw6kaB/HM2Y8GI3UMuI8JwLzWrs5hrSg=
@@ -97,10 +99,12 @@ github.com/storage-lock/go-sqlserver-storage v0.0.2 h1:MxkPaEREnp0YaaCLfKijQDDs8
 github.com/storage-lock/go-sqlserver-storage v0.0.2/go.mod h1:KihdPF03s++VQxYo69TEAZC0QmXN/1d9a0tkdosgy/w=
 github.com/storage-lock/go-storage v0.0.3 h1:oHhi/qTfZjqLZGtAM3H7El6Fffr+la5pTaIjZhf6B3I=
 github.com/storage-lock/go-storage v0.0.3/go.mod h1:dadPDy/3aiXNNgGcbqOCZ48Bafo8tHQl3ybhwKZ4I0o=
-github.com/storage-lock/go-storage-events v0.0.6 h1:UM4bITGRrXdlIoCQFEKJAl/F0PMZk1x+eWw4Kj0xB8s=
-github.com/storage-lock/go-storage-events v0.0.6/go.mod h1:xKUTJj1QVan3GJOoISbQvmoNa7CcCaWiAtnlcThVTIY=
-github.com/storage-lock/go-storage-lock v0.0.6 h1:4J26R+CDa6tx5DnQNG+6DbF3QklB2djf0YmnFbiUXIM=
-github.com/storage-lock/go-storage-lock v0.0.6/go.mod h1:jVtNQMFpBdwyNTVZwVsyPDQYc8CFyLoIoffhYOoM80k=
+github.com/storage-lock/go-storage-events v0.0.8 h1:LEHEquFf7E+KhM/357w+nXY1/+N0EZeCiZMZhkMNQJI=
+github.com/storage-lock/go-storage-events v0.0.8/go.mod h1:vGFyJHNIrBNAb7bRXHBWBYTWL1m22svGLYwkTc1k3L0=
+github.com/storage-lock/go-storage-lock v0.0.7 h1:ZXAU8seQ+ZVeVtgaGWMd/gqeo5eOt3AkdjaBKJU00Xs=
+github.com/storage-lock/go-storage-lock v0.0.7/go.mod h1:70K2xoM3FUDG49Ivr3fSevuJgeq5YwWwCDUhlLVZLjY=
+github.com/storage-lock/go-storage-lock-coordination v0.0.3 h1:IpBV1rXWXkWmPVj6VhM1O59XUIpmAN3bUb5USy3mnfQ=
+github.com/storage-lock/go-storage-lock-coordination v0.0.3/go.mod h1:So+pYJrg7a7aCxx3RFqbBgUDGzyzV+r8OD7rcHZ7SAo=
 github.com/storage-lock/go-tidb-storage v0.0.2 h1:+YZmTdmzqTw23G2RsRML6kVr35oXqgTg9CjVitr7540=
 github.com/storage-lock/go-tidb-storage v0.0.2/go.mod h1:X5Khl85/hTZcEwZHbb1mWzFRxN1LffK3cBXDY11Lpsg=
 github.com/storage-lock/go-utils v0.0.2 h1:pdacTOlD+AHqwWVmDqZLcjKF+7p8TjsmlvZ9bmmkIfE=
