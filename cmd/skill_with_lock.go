@@ -57,15 +57,17 @@ Examples:
 
 		acquireCtx, acquireCancel := context.WithTimeout(ctx, timeout)
 		if err := lock.Lock(acquireCtx, owner); err != nil {
+			// 必须先读 Err 再取消：取消之后 Err 永远是 context.Canceled，
+			// 会把"锁被别人占着""存储报错"这些真实原因全部掩盖掉。
+			ctxErr := acquireCtx.Err()
 			acquireCancel()
 			result := skillResult{LockID: skillWithLockID, OwnerID: owner}
-			if ctxErr := acquireCtx.Err(); ctxErr != nil {
+			if ctxErr != nil {
 				cancel()
 				return emit(result, ctxErr)
 			}
-			acquireCancel()
 			if isContended(err) {
-				return emit(skillResult{LockID: skillWithLockID, OwnerID: owner, Status: "busy"}, err)
+				result.Status = "busy"
 			}
 			return emit(result, err)
 		}
