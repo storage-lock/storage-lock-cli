@@ -57,6 +57,18 @@ CLI=storage-lock-cli ./skills/smoke-test.sh
 --timeout=30s                          # 单条命令上限
 ```
 
+已接入并通过端到端验证的后端（`--storage` 值）：
+
+| 后端 | 示例 DSN |
+| --- | --- |
+| `redis` | `redis://127.0.0.1:6379/0` |
+| `mariadb` | `root:rootpass@tcp(127.0.0.1:13306)/storage_lock_test` |
+| `mysql` | `root:rootpass@tcp(127.0.0.1:3306)/storage_lock_test` |
+| `postgresql` | `postgres://postgres:pgpass@127.0.0.1:5432/storage_lock_test?sslmode=disable` |
+| `mongodb` | `mongodb://127.0.0.1:27017/storage_lock_test` |
+
+另有 `tidb`、`sql-server` 已注册但未做端到端验证。选后端只看两点：**并发下 CAS 必须原子**、**能给出统一的当前时间**——这正是不支持 CAS 的存储（如 ClickHouse）不能用于 Agent 协作的原因。
+
 **所有参与协作的 Agent 必须使用相同的 `--storage` 和 `--dsn`**，否则它们看到的不是同一套锁。
 
 ## 状态字典

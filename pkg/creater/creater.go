@@ -10,6 +10,7 @@ import (
 	mongodb_storage "github.com/storage-lock/go-mongodb-storage"
 	mysql_storage "github.com/storage-lock/go-mysql-storage"
 	postgresql_storage "github.com/storage-lock/go-postgresql-storage"
+	redis_storage "github.com/storage-lock/go-redis-storage"
 	sqlserver_storage "github.com/storage-lock/go-sqlserver-storage"
 	"github.com/storage-lock/go-storage"
 	tidb_storage "github.com/storage-lock/go-tidb-storage"
@@ -45,6 +46,11 @@ func init() {
 		connectionManager := mysql_storage.NewMysqlConnectionManagerFromDsn(dsn)
 		options := mysql_storage.NewMysqlStorageOptions().SetConnectionManager(connectionManager)
 		return mysql_storage.NewMysqlStorage(ctx, options)
+	})
+	// redis 走 Lua 脚本做 CAS，延迟最低，是 Agent 协作场景里成本最小的一种后端。
+	register(redis_storage.RedisStorageName, func(ctx context.Context, dsn string) (storage.Storage, error) {
+		options := redis_storage.NewRedisStorageOptionsWithURI(dsn)
+		return redis_storage.NewRedisStorage(ctx, options)
 	})
 	register(mongodb_storage.MongoStorageName, func(ctx context.Context, dsn string) (storage.Storage, error) {
 		connectionManager := mongodb_storage.NewMongoConnectionManagerFromURI(dsn)

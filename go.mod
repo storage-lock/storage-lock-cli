@@ -14,6 +14,7 @@ require (
 	github.com/storage-lock/go-mongodb-storage v0.0.1
 	github.com/storage-lock/go-mysql-storage v0.0.3
 	github.com/storage-lock/go-postgresql-storage v0.0.3
+	github.com/storage-lock/go-redis-storage v0.0.2
 	github.com/storage-lock/go-sqlserver-storage v0.0.2
 	github.com/storage-lock/go-storage v0.0.3
 	github.com/storage-lock/go-storage-lock v0.0.7
@@ -23,8 +24,10 @@ require (
 
 require (
 	github.com/beevik/ntp v1.3.0 // indirect
+	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/denisenkom/go-mssqldb v0.12.3 // indirect
+	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
 	github.com/go-sql-driver/mysql v1.7.1 // indirect
 	github.com/golang-infrastructure/go-goroutine-id v0.0.0-20230917075314-f1af231c0b06 // indirect
 	github.com/golang-infrastructure/go-pointer v0.0.5 // indirect
@@ -39,6 +42,7 @@ require (
 	github.com/mattn/go-isatty v0.0.19 // indirect
 	github.com/montanaflynn/stats v0.7.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
+	github.com/redis/go-redis/v9 v9.7.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/storage-lock/go-events v0.0.5 // indirect
 	github.com/storage-lock/go-ntp-time-provider v0.0.3 // indirect

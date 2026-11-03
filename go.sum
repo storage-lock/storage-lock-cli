@@ -5,6 +5,12 @@ github.com/DATA-DOG/go-sqlmock v1.5.2 h1:OcvFkGmslmlZibjAjaHm3L//6LiuBgolP7Oputl
 github.com/DATA-DOG/go-sqlmock v1.5.2/go.mod h1:88MAG/4G7SMwSE3CeA0ZKzrT5CiOU3OJ+JlNzwDqpNU=
 github.com/beevik/ntp v1.3.0 h1:/w5VhpW5BGKS37vFm1p9oVk/t4HnnkKZAZIubHM6F7Q=
 github.com/beevik/ntp v1.3.0/go.mod h1:vD6h1um4kzXpqmLTuu0cCLcC+NfvC0IC+ltmEDA8E78=
+github.com/bsm/ginkgo/v2 v2.12.0 h1:Ny8MWAHyOepLGlLKYmXG4IEkioBysk6GpaRTLC8zwWs=
+github.com/bsm/ginkgo/v2 v2.12.0/go.mod h1:SwYbGRRDovPVboqFv0tPTcG1sN61LM1Z4ARdbAV9g4c=
+github.com/bsm/gomega v1.27.10 h1:yeMWxP2pV2fG3FgAODIY8EiRE3dy0aeFYt4l7wh6yKA=
+github.com/bsm/gomega v1.27.10/go.mod h1:JyEr/xRbxbtgWNi8tIEVPUYZ5Dzef52k01W3YH0H+O0=
+github.com/cespare/xxhash/v2 v2.3.0 h1:UL815xU9SqsFlibzuggzjXhog7bL6oX9BbNZnL2UFvs=
+github.com/cespare/xxhash/v2 v2.3.0/go.mod h1:VGX0DQ3Q6kWi7AoAeZDth3/j3BFtOZR5XLFGgcrjCOs=
 github.com/cpuguy83/go-md2man/v2 v2.0.1/go.mod h1:tgQtvFlXSQOSOSIRvRPT7W67SCa46tRHOmNcaadrF8o=
 github.com/cpuguy83/go-md2man/v2 v2.0.2/go.mod h1:tgQtvFlXSQOSOSIRvRPT7W67SCa46tRHOmNcaadrF8o=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
@@ -12,6 +18,8 @@ github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/denisenkom/go-mssqldb v0.12.3 h1:pBSGx9Tq67pBOTLmxNuirNTeB8Vjmf886Kx+8Y+8shw=
 github.com/denisenkom/go-mssqldb v0.12.3/go.mod h1:k0mtMFOnU+AihqFxPMiF05rtiDrorD1Vrm1KEz5hxDo=
+github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f h1:lO4WD4F/rVNCu3HqELle0jiPLLBs70cWOduZpkS1E78=
+github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f/go.mod h1:cuUVRXasLTGF7a8hSLbxyZXjz+1KgoB3wDUb6vlszIc=
 github.com/dnaeon/go-vcr v1.2.0/go.mod h1:R4UdLID7HZT3taECzJs4YgbbH6PIGXB6W/sc5OLb6RQ=
 github.com/fatih/color v1.13.0/go.mod h1:kLAiJbzzSOZDVNGyDpeOxJ47H46qBXwg5ILebYFFOfk=
 github.com/fatih/color v1.15.0 h1:kOqh6YHBtK8aywxGerMG2Eq3H6Qgoqeo13Bk2Mv/nBs=
@@ -20,6 +28,8 @@ github.com/go-sql-driver/mysql v1.7.1 h1:lUIinVbN1DY0xBg0eMOzmmtGoHwWBbvnWubQUrt
 github.com/go-sql-driver/mysql v1.7.1/go.mod h1:OXbVy3sEdcQ2Doequ6Z5BW6fXNQTmx+9S1MCJN5yJMI=
 github.com/golang-infrastructure/go-goroutine-id v0.0.0-20230917075314-f1af231c0b06 h1:A28MrYe3pSClGhMVyTQF6wd3h3Tt/U31nddoK60+HZQ=
 github.com/golang-infrastructure/go-goroutine-id v0.0.0-20230917075314-f1af231c0b06/go.mod h1:1L+eneS0HXUlZP0tmESGhlmpJ3hl063JGz6UQaJCmY0=
+github.com/golang-infrastructure/go-if-expression v0.0.3 h1:Ic6L/s250nwtQz8CtTFpkWopCwsWmxQErSRkrBqBVj4=
+github.com/golang-infrastructure/go-if-expression v0.0.3/go.mod h1:U4ZtU29/RtZ/cM0tAdBzFaFxENFShSFj+jCRFRE/cv4=
 github.com/golang-infrastructure/go-iterator v0.0.0-20230524171120-56988a9b127c h1:h4321AFRVv5rTKcColUjE5pa+Y1exG1e6aEXn43L/Eg=
 github.com/golang-infrastructure/go-iterator v0.0.0-20230524171120-56988a9b127c/go.mod h1:Guf14ZZ7f7qiE0YpZbUkICcm7LWc3nrn3/gDObT//WI=
 github.com/golang-infrastructure/go-message-channel v0.0.0-20230310152217-2633ccd80801 h1:qbvHfjYmZHK4winZjawTIjc141guDIK6H2QZDkd48tU=
@@ -71,6 +81,8 @@ github.com/montanaflynn/stats v0.7.1/go.mod h1:etXPPgVO6n31NxCd9KQUMvCM+ve0ruNzt
 github.com/pkg/browser v0.0.0-20180916011732-0a3d74bf9ce4/go.mod h1:4OwLy04Bl9Ef3GJJCoec+30X3LQs/0/m4HFRt/2LUSA=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
+github.com/redis/go-redis/v9 v9.7.0 h1:HhLSs+B6O021gwzl+locl0zEDnyNkxMtf/Z3NNBMa9E=
+github.com/redis/go-redis/v9 v9.7.0/go.mod h1:f6zhXITC7JUJIlPEiBOTXxJgPLdZcA93GewI7inzyWw=
 github.com/rogpeppe/go-internal v1.14.1 h1:UQB4HGPB6osV0SQTLymcB4TgvyWu6ZyliaW0tI/otEQ=
 github.com/rogpeppe/go-internal v1.14.1/go.mod h1:MaRKkUm5W0goXpeCfT7UZI6fk/L7L7so1lCWt35ZSgc=
 github.com/russross/blackfriday/v2 v2.1.0/go.mod h1:+Rmxgy9KzJVeS9/2gXHxylqXiyQDYRxCVz55jmeOWTM=
@@ -93,6 +105,8 @@ github.com/storage-lock/go-ntp-time-provider v0.0.3 h1:5Pc4vU+WuQanmcDhPzXOg3m4A
 github.com/storage-lock/go-ntp-time-provider v0.0.3/go.mod h1:J5UG8t+fHGLiK+sd6H67Fe6trFeq8ZfsToPNWHVUQSM=
 github.com/storage-lock/go-postgresql-storage v0.0.3 h1:6Uu5HuL6YNuU8LTORNWXNJIaA6Y7842RvqiCchOzgBw=
 github.com/storage-lock/go-postgresql-storage v0.0.3/go.mod h1:Pz3ARCdZYVft+bQOXXp+AmR8w4eCDpvMQLjiRZnUyW8=
+github.com/storage-lock/go-redis-storage v0.0.2 h1:wzeo0NGpHtmKMcyzTyk561ZRalDi7lWamvqw26qJZzQ=
+github.com/storage-lock/go-redis-storage v0.0.2/go.mod h1:gg2Aoz1v9E23jE6FzaG1zDsKOfZtS8f0/dxEJEnp5cU=
 github.com/storage-lock/go-sql-based-storage v0.0.2 h1:2Wd9QUlg0RE7UcsM8906Q7ugUZdWGUpIdgtoOqp/Fwo=
 github.com/storage-lock/go-sql-based-storage v0.0.2/go.mod h1:agqyZRJnddBQnKsYDRaWt6TIrGo7Obkodlpe0QP2WiU=
 github.com/storage-lock/go-sqlserver-storage v0.0.2 h1:MxkPaEREnp0YaaCLfKijQDDs8PK0OKMbONiw1Z4CG8E=
@@ -105,6 +119,8 @@ github.com/storage-lock/go-storage-lock v0.0.7 h1:ZXAU8seQ+ZVeVtgaGWMd/gqeo5eOt3
 github.com/storage-lock/go-storage-lock v0.0.7/go.mod h1:70K2xoM3FUDG49Ivr3fSevuJgeq5YwWwCDUhlLVZLjY=
 github.com/storage-lock/go-storage-lock-coordination v0.0.3 h1:IpBV1rXWXkWmPVj6VhM1O59XUIpmAN3bUb5USy3mnfQ=
 github.com/storage-lock/go-storage-lock-coordination v0.0.3/go.mod h1:So+pYJrg7a7aCxx3RFqbBgUDGzyzV+r8OD7rcHZ7SAo=
+github.com/storage-lock/go-storage-test-helper v0.0.3 h1:y8B24zJkQaI7uYOW2MTBIHTZXbRpkEG6rS1XMWAttjs=
+github.com/storage-lock/go-storage-test-helper v0.0.3/go.mod h1:Zn6YIq0r0pmK+naGUhRhb7TqTEFDjoU+25yIugt9iAw=
 github.com/storage-lock/go-tidb-storage v0.0.2 h1:+YZmTdmzqTw23G2RsRML6kVr35oXqgTg9CjVitr7540=
 github.com/storage-lock/go-tidb-storage v0.0.2/go.mod h1:X5Khl85/hTZcEwZHbb1mWzFRxN1LffK3cBXDY11Lpsg=
 github.com/storage-lock/go-utils v0.0.2 h1:pdacTOlD+AHqwWVmDqZLcjKF+7p8TjsmlvZ9bmmkIfE=
