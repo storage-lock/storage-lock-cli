@@ -18,6 +18,15 @@ cd storage-lock-cli && go install .
 cp -r storage-lock-cli/skills/storage-lock-* ~/.claude/skills/
 ```
 
+### 验证安装
+
+```bash
+# 需要真实存储后端，默认用 sl-mariadb
+CLI=storage-lock-cli ./skills/smoke-test.sh
+```
+
+脚本会跑完单 key 锁生命周期、10 进程互斥、5 进程选主、信号量容量、`with-lock` 续租与退出码透传，最后输出 `PASS=n FAIL=n`。
+
 然后重启 Claude Code 会话，`/skills` 中会看到：
 
 | Skill | 用途 |
