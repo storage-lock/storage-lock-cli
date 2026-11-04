@@ -7,10 +7,12 @@ import (
 	"strings"
 
 	mariadb_storage "github.com/storage-lock/go-mariadb-storage"
+	memory_storage "github.com/storage-lock/go-memory-storage"
 	mongodb_storage "github.com/storage-lock/go-mongodb-storage"
 	mysql_storage "github.com/storage-lock/go-mysql-storage"
 	postgresql_storage "github.com/storage-lock/go-postgresql-storage"
 	redis_storage "github.com/storage-lock/go-redis-storage"
+	sqlite3_storage "github.com/storage-lock/go-sqlite3-storage"
 	sqlserver_storage "github.com/storage-lock/go-sqlserver-storage"
 	"github.com/storage-lock/go-storage"
 	tidb_storage "github.com/storage-lock/go-tidb-storage"
@@ -32,6 +34,10 @@ var storageCreateMap map[string]StorageCreateFunc = make(map[string]StorageCreat
 // 现行构造器会在创建时连库并 Init，没有 DSN 必然失败返回 nil，那样整个注册表
 // 会是空的（历史上正是这个写法让 --storage 永远报 "does not exist"）。
 func init() {
+	// memory 存储适合单机多进程测试，无需外部依赖
+	register(memory_storage.NewMemoryStorage().GetName(), func(ctx context.Context, dsn string) (storage.Storage, error) {
+		return memory_storage.NewMemoryStorage(), nil
+	})
 	register(mariadb_storage.StorageName, func(ctx context.Context, dsn string) (storage.Storage, error) {
 		connectionManager := mariadb_storage.NewMariadbConnectionManagerFromDsn(dsn)
 		options := mariadb_storage.NewMariadbStorageOptions().SetConnectionManager(connectionManager)
@@ -61,6 +67,15 @@ func init() {
 		connectionManager := postgresql_storage.NewPostgresqlConnectionGetterFromDsn(dsn)
 		options := postgresql_storage.NewPostgresqlStorageOptions().SetConnectionManager(connectionManager)
 		return postgresql_storage.NewPostgresqlStorage(ctx, options)
+	})
+	// sqlite3 适合单机多进程，无需外部服务
+	register(sqlite3_storage.SqliteStorageName, func(ctx context.Context, dsn string) (storage.Storage, error) {
+		connectionManager, err := sqlite3_storage.NewSqlite3ConnectionManager(dsn)
+		if err != nil {
+			return nil, err
+		}
+		options := sqlite3_storage.NewSqlite3StorageOptions().SetConnectionManager(connectionManager)
+		return sqlite3_storage.NewSqlite3Storage(ctx, options)
 	})
 	register(sqlserver_storage.StorageName, func(ctx context.Context, dsn string) (storage.Storage, error) {
 		connectionManager := sqlserver_storage.NewSqlServerConnectionManagerFromDsn(dsn)

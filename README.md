@@ -2,6 +2,20 @@
 
 用于分布式锁的安全运维、前台持有和 Agent 协作。
 
+## 免费存储后端
+
+CLI 本身是客户端工具，需要一个共享的存储后端来保证跨进程/跨机器的原子性。以下是免费且易于使用的存储后端：
+
+| 后端 | 适用场景 | 跨机器 | 多进程 | 需要安装 | 快速启动 |
+| --- | --- | --- | --- | --- | --- |
+| **memory** | 单进程测试 | ❌ | ❌ | 无 | `--storage=memory` |
+| **sqlite3** | 单机多进程 | ❌ | ✅ | 无（Go 内置） | `--storage=sqlite3 --dsn="/tmp/locks.db"` |
+| **redis** | 跨机器分布式 | ✅ | ✅ | Docker | `docker run -d -p 6379:6379 redis` |
+| **mariadb/mysql** | 跨机器分布式 | ✅ | ✅ | Docker 或本地 | 见数据库文档 |
+| **postgresql** | 跨机器分布式 | ✅ | ✅ | Docker 或本地 | 见数据库文档 |
+
+详细的免费存储后端指南见 [FREE_BACKENDS.md](FREE_BACKENDS.md)。
+
 ## 配置与命令
 
 所有需要访问 Storage 的命令都需要：

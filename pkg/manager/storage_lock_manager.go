@@ -2,10 +2,15 @@ package manager
 
 import (
 	"context"
+	"errors"
+
 	message_channel "github.com/golang-infrastructure/go-message-channel"
 	"github.com/storage-lock/go-storage"
 	storage_lock "github.com/storage-lock/go-storage-lock"
 )
+
+// errPhysicalDeleteUnsupported 拒绝删掉锁记录。物理删除会让下一次获取的 fencing 版本回到 1。
+var errPhysicalDeleteUnsupported = errors.New("physical lock deletion is unsupported; release the owner lease and retain the tombstone")
 
 // NOTE: 本文件曾引用 `github.com/storage-lock/go-storage-lock/pkg/storage` 与
 // `.../pkg/storage_lock`——那是 2023 年中之前单体仓库时代的旧内部路径，存储拆分为
@@ -34,31 +39,19 @@ func (x *StorageLockManager) List(ctx context.Context) ([]*storage.LockInformati
 }
 
 func (x *StorageLockManager) Delete(ctx context.Context, lockId string) error {
-	get, err := x.storage.Get(ctx, lockId)
-	if err != nil {
+	if _, err := x.storage.Get(ctx, lockId); err != nil {
 		return err
 	}
-	lockInformation, err := storage.LockInformationFromJsonString(get)
-	if err != nil {
-		return err
-	}
-	return x.storage.DeleteWithVersion(ctx, lockId, lockInformation.Version, lockInformation)
+	// 记录留在存储里。释放租约仍走墓碑，版本继续增加。
+	return errPhysicalDeleteUnsupported
 }
 
 func (x *StorageLockManager) Clear(ctx context.Context, channel *message_channel.Channel[*storage.LockInformation]) error {
-	list, err := x.storage.List(ctx)
-	if err != nil {
+	if _, err := x.List(ctx); err != nil {
 		return err
 	}
-	for list.Next() {
-		lockInformation := list.Value()
-		err := x.storage.DeleteWithVersion(ctx, lockInformation.LockId, lockInformation.Version, lockInformation)
-		if err != nil {
-			return err
-		}
-		_ = channel.Send(ctx, lockInformation)
-	}
-	return nil
+	// 不清空，也不往 channel 里发送已删除的记录。
+	return errPhysicalDeleteUnsupported
 }
 
 func (x *StorageLockManager) Lock(ctx context.Context, lockId, ownerId string) error {

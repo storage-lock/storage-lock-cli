@@ -11,15 +11,32 @@ require (
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/spf13/cobra v1.7.0
 	github.com/storage-lock/go-mariadb-storage v0.0.2
+	github.com/storage-lock/go-memory-storage v0.0.1
 	github.com/storage-lock/go-mongodb-storage v0.0.1
 	github.com/storage-lock/go-mysql-storage v0.0.3
 	github.com/storage-lock/go-postgresql-storage v0.0.3
 	github.com/storage-lock/go-redis-storage v0.0.2
+	github.com/storage-lock/go-sqlite3-storage v0.0.1
 	github.com/storage-lock/go-sqlserver-storage v0.0.2
 	github.com/storage-lock/go-storage v0.0.3
 	github.com/storage-lock/go-storage-lock v0.0.7
 	github.com/storage-lock/go-storage-lock-coordination v0.0.3
 	github.com/storage-lock/go-tidb-storage v0.0.2
+)
+
+replace (
+	github.com/storage-lock/go-mariadb-storage => ../go-mariadb-storage
+	github.com/storage-lock/go-memory-storage => ../go-memory-storage
+	github.com/storage-lock/go-mongodb-storage => ../go-mongodb-storage
+	github.com/storage-lock/go-mysql-storage => ../go-mysql-storage
+	github.com/storage-lock/go-postgresql-storage => ../go-postgresql-storage
+	github.com/storage-lock/go-redis-storage => ../go-redis-storage
+	github.com/storage-lock/go-sqlite3-storage => ../go-sqlite3-storage
+	github.com/storage-lock/go-sqlserver-storage => ../go-sqlserver-storage
+	github.com/storage-lock/go-storage => ../go-storage
+	github.com/storage-lock/go-storage-lock => ../go-storage-lock
+	github.com/storage-lock/go-storage-lock-coordination => ../go-storage-lock-coordination
+	github.com/storage-lock/go-tidb-storage => ../go-tidb-storage
 )
 
 require (
@@ -40,6 +57,7 @@ require (
 	github.com/lib/pq v1.10.9 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.19 // indirect
+	github.com/mattn/go-sqlite3 v1.14.17 // indirect
 	github.com/montanaflynn/stats v0.7.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/redis/go-redis/v9 v9.7.0 // indirect
