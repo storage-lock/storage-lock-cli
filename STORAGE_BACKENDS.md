@@ -273,6 +273,25 @@ storage-lock-cli --storage=firebase --dsn="https://your-project-id.firebaseio.co
 - 所有锁 ID 自动加上租户前缀：`{tenant-id}:lock-id`
 - 确保不同用户的锁互不干扰
 
+**管理员：创建公开 Firebase 项目**
+
+需要维护者创建一个公开的 Firebase 项目：
+
+1. 访问 https://console.firebase.google.com/
+2. 创建新项目 `storage-lock-public`
+3. 启用 Realtime Database
+4. 配置公开规则：
+   ```json
+   {
+     "rules": {
+       ".read": true,
+       ".write": true
+     }
+   }
+   ```
+5. 获取数据库 URL（格式：`https://storage-lock-public.firebaseio.com`）
+6. 更新 CLI 代码中的 `defaultFirebaseURL` 常量
+
 **安全说明**：
 - ⚠️ 默认公开项目任何人都能读写（数据隔离仅靠租户 ID）
 - ⚠️ 适合开发和测试，不适合生产环境
