@@ -42,17 +42,31 @@ func init() {
 	// 每台机器生成一次，确保同一台机器的所有 CLI 使用相同的租户 ID
 	tenantID := getTenantID()
 
+	// 默认公开 Firebase 项目（零配置，无需用户自己创建）
+	// 注意：这是一个公开项目，任何人都能读写，仅适合开发测试
+	const defaultFirebaseURL = "https://storage-lock-public.firebaseio.com"
+
 	// firebase 存储适合云端多 Agent 协作，免费额度大，无需配置
 	register("firebase-storage", func(ctx context.Context, dsn string) (storage.Storage, error) {
+		// 如果用户没有提供 DSN，使用默认公开项目
+		databaseURL := dsn
+		if databaseURL == "" {
+			databaseURL = defaultFirebaseURL
+		}
 		options := &firebase_storage.FirebaseStorageOptions{
-			DatabaseURL: dsn,
+			DatabaseURL: databaseURL,
 			TenantID:    tenantID,
 		}
 		return firebase_storage.NewFirebaseStorage(ctx, options)
 	})
 	register("firebase", func(ctx context.Context, dsn string) (storage.Storage, error) {
+		// 如果用户没有提供 DSN，使用默认公开项目
+		databaseURL := dsn
+		if databaseURL == "" {
+			databaseURL = defaultFirebaseURL
+		}
 		options := &firebase_storage.FirebaseStorageOptions{
-			DatabaseURL: dsn,
+			DatabaseURL: databaseURL,
 			TenantID:    tenantID,
 		}
 		return firebase_storage.NewFirebaseStorage(ctx, options)
