@@ -10,7 +10,7 @@ CLI 本身是客户端工具，需要一个共享的存储后端来保证跨进�
 
 - **单机多 Agent**：SQLite3（免费，零依赖）
 - **局域网多 Agent**：Redis/MariaDB/PostgreSQL（自建）
-- **云端多 Agent**：Upstash Redis（免费额度大）或 Redis Cloud
+- **云端多 Agent**：Firebase Realtime Database（推荐，免配置，免费额度大）
 
 详细指南见 [STORAGE_BACKENDS.md](STORAGE_BACKENDS.md)，包含本地/自建/云端存储后端的完整对比和使用方法。
 

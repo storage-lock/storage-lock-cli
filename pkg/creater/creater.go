@@ -3,9 +3,11 @@ package creater
 import (
 	"context"
 	"fmt"
+	"os"
 	"sort"
 	"strings"
 
+	firebase_storage "github.com/storage-lock/go-firebase-storage"
 	mariadb_storage "github.com/storage-lock/go-mariadb-storage"
 	memory_storage "github.com/storage-lock/go-memory-storage"
 	mongodb_storage "github.com/storage-lock/go-mongodb-storage"
@@ -16,6 +18,8 @@ import (
 	sqlserver_storage "github.com/storage-lock/go-sqlserver-storage"
 	"github.com/storage-lock/go-storage"
 	tidb_storage "github.com/storage-lock/go-tidb-storage"
+
+	"github.com/google/uuid"
 )
 
 // StorageCreateFunc 用来创建Storage的函数
@@ -34,6 +38,25 @@ var storageCreateMap map[string]StorageCreateFunc = make(map[string]StorageCreat
 // 现行构造器会在创建时连库并 Init，没有 DSN 必然失败返回 nil，那样整个注册表
 // 会是空的（历史上正是这个写法让 --storage 永远报 "does not exist"）。
 func init() {
+	// 生成一个固定的租户 ID，用于多租户隔离
+	// 每台机器生成一次，确保同一台机器的所有 CLI 使用相同的租户 ID
+	tenantID := getTenantID()
+
+	// firebase 存储适合云端多 Agent 协作，免费额度大，无需配置
+	register("firebase-storage", func(ctx context.Context, dsn string) (storage.Storage, error) {
+		options := &firebase_storage.FirebaseStorageOptions{
+			DatabaseURL: dsn,
+			TenantID:    tenantID,
+		}
+		return firebase_storage.NewFirebaseStorage(ctx, options)
+	})
+	register("firebase", func(ctx context.Context, dsn string) (storage.Storage, error) {
+		options := &firebase_storage.FirebaseStorageOptions{
+			DatabaseURL: dsn,
+			TenantID:    tenantID,
+		}
+		return firebase_storage.NewFirebaseStorage(ctx, options)
+	})
 	// memory 存储适合单机多进程测试，无需外部依赖
 	register(memory_storage.NewMemoryStorage().GetName(), func(ctx context.Context, dsn string) (storage.Storage, error) {
 		return memory_storage.NewMemoryStorage(), nil
@@ -105,6 +128,33 @@ func register(name string, createFunc StorageCreateFunc) {
 			storageCreateMap[short] = createFunc
 		}
 	}
+}
+
+// getTenantID 生成或获取租户 ID，用于多租户隔离
+// 优先使用环境变量 STORAGE_LOCK_TENANT_ID，否则生成一个随机 UUID 并持久化
+func getTenantID() string {
+	// 优先使用环境变量
+	if tenantID := strings.TrimSpace(strings.ToLower(os.Getenv("STORAGE_LOCK_TENANT_ID"))); tenantID != "" {
+		return tenantID
+	}
+
+	// 从文件读取持久化的租户 ID
+	homeDir, err := os.UserHomeDir()
+	if err == nil {
+		tenantFile := homeDir + "/.storage-lock-tenant-id"
+		if data, err := os.ReadFile(tenantFile); err == nil {
+			if tenantID := strings.TrimSpace(string(data)); tenantID != "" {
+				return tenantID
+			}
+		}
+		// 生成新的租户 ID 并持久化
+		tenantID := uuid.New().String()
+		_ = os.WriteFile(tenantFile, []byte(tenantID), 0600)
+		return tenantID
+	}
+
+	// 如果无法持久化，生成一个随机 UUID
+	return uuid.New().String()
 }
 
 // ListSupportStorageName 列出当前支持的Storage都有哪些

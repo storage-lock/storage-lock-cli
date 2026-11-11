@@ -251,12 +251,53 @@ docker run -d -p 6379:6379 --name redis redis:latest
 
 如果你的 Agent 需要跨不同网络环境协作（例如云端 CI/CD、远程服务器、多地域），建议使用云端存储后端。
 
-### 云端存储对比
+### 推荐方案：Firebase Realtime Database（免配置，免费额度大）
 
-| 云存储 | 提供商 | 免费额度 | 免费试用 | 延迟 | 适合场景 |
-| --- | --- | --- | --- | --- | --- |
-| **Upstash Redis** | Upstash | 10K 命令/天 | 有 | 低（全球边缘） | 跨地域 Agent 协作 |
-| **Redis Cloud** | Redis Labs | 30MB 存储 | 有 | 中等 | 标准云端 Redis |
+**为什么推荐 Firebase**：
+- ✅ 免费额度：100K 连接/天，1GB 存储（足够开发和测试）
+- ✅ 无需用户自己部署，Firebase 托管
+- ✅ 实时数据库，支持实时监听
+- ✅ 配置简单，只需 5 分钟
+- ✅ 通过公开规则实现免认证（用户无需配置密钥）
+
+**配置步骤**：
+1. 访问 https://console.firebase.google.com/
+2. 创建新项目（免费）
+3. 启用 Realtime Database
+4. 配置公开规则：
+   ```json
+   {
+     "rules": {
+       ".read": true,
+       ".write": true
+     }
+   }
+   ```
+5. 获取数据库 URL（格式：`https://your-project-id.firebaseio.com`）
+
+**使用方法**：
+```bash
+# 使用 Firebase 存储
+storage-lock-cli --storage=firebase --dsn="https://your-project-id.firebaseio.com" skills lock --id=my-lock --ttl=30s
+```
+
+**多租户隔离**：
+- CLI 会自动生成或使用配置的租户 ID
+- 所有锁 ID 自动加上租户前缀：`{tenant-id}:lock-id`
+- 确保不同用户的锁互不干扰
+
+**安全说明**：
+- ⚠️ 公开规则意味着任何人都能读写数据库
+- ⚠️ 适合开发和测试，不适合生产环境
+- ⚠️ 生产环境建议配置 Firebase Authentication 并限制规则
+
+### 其他云端存储对比
+
+| 云存储 | 提供商 | 免费额度 | 免费试用 | 延迟 | 配置难度 | 适合场景 |
+| --- | --- | --- | --- | --- | --- | --- |
+| **Firebase Realtime DB** | Google | 100K 连接/天 | 有 | 中等 | ⭐ | 跨地域 Agent 协作（推荐） |
+| **Upstash Redis** | Upstash | 10K 命令/天 | 有 | 低（全球边缘） | ⭐⭐ | 跨地域 Agent 协作 |
+| **Redis Cloud** | Redis Labs | 30MB 存储 | 有 | 中等 | ⭐⭐ | 标准云端 Redis |
 | **Cloud SQL (PostgreSQL)** | Google Cloud | 无 | 90 天 | 中等 | 关系型数据库 |
 | **Amazon RDS (PostgreSQL)** | AWS | 无 | 12 个月 | 中等 | 关系型数据库 |
 | **Azure Database (PostgreSQL)** | Microsoft Azure | 无 | 12 个月 | 中等 | 关系型数据库 |

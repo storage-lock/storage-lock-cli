@@ -10,6 +10,7 @@ require (
 	github.com/ivanpirog/coloredcobra v1.0.1
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/spf13/cobra v1.7.0
+	github.com/storage-lock/go-firebase-storage v0.0.1
 	github.com/storage-lock/go-mariadb-storage v0.0.2
 	github.com/storage-lock/go-memory-storage v0.0.1
 	github.com/storage-lock/go-mongodb-storage v0.0.1
@@ -25,6 +26,7 @@ require (
 )
 
 replace (
+	github.com/storage-lock/go-firebase-storage => ../go-firebase-storage
 	github.com/storage-lock/go-mariadb-storage => ../go-mariadb-storage
 	github.com/storage-lock/go-memory-storage => ../go-memory-storage
 	github.com/storage-lock/go-mongodb-storage => ../go-mongodb-storage
