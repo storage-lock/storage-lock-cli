@@ -12,15 +12,15 @@ require (
 	github.com/spf13/cobra v1.7.0
 	github.com/storage-lock/go-firebase-storage v0.0.1
 	github.com/storage-lock/go-mariadb-storage v0.0.2
-	github.com/storage-lock/go-memory-storage v0.0.1
+	github.com/storage-lock/go-memory-storage v0.1.0
 	github.com/storage-lock/go-mongodb-storage v0.0.1
 	github.com/storage-lock/go-mysql-storage v0.0.3
 	github.com/storage-lock/go-postgresql-storage v0.0.3
 	github.com/storage-lock/go-redis-storage v0.0.2
 	github.com/storage-lock/go-sqlite3-storage v0.0.1
 	github.com/storage-lock/go-sqlserver-storage v0.0.2
-	github.com/storage-lock/go-storage v0.0.3
-	github.com/storage-lock/go-storage-lock v0.0.7
+	github.com/storage-lock/go-storage v0.1.0
+	github.com/storage-lock/go-storage-lock v0.1.0
 	github.com/storage-lock/go-storage-lock-coordination v0.0.3
 	github.com/storage-lock/go-tidb-storage v0.0.2
 )
