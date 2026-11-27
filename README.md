@@ -2,6 +2,36 @@
 
 用于分布式锁的安全运维、前台持有和 Agent 协作。
 
+## 安装
+
+**下载预编译二进制**（推荐，不需要 Go 环境）：
+
+```bash
+# 版本号换成 Releases 页面上的最新版本；平台可选 linux/darwin/windows 与 amd64/arm64
+VER=v0.2.3
+curl -fsSLO "https://github.com/storage-lock/storage-lock-cli/releases/download/$VER/storage-lock-cli_${VER#v}_linux_amd64.tar.gz"
+curl -fsSLO "https://github.com/storage-lock/storage-lock-cli/releases/download/$VER/checksums.txt"
+sha256sum -c checksums.txt --ignore-missing
+tar -xzf "storage-lock-cli_${VER#v}_linux_amd64.tar.gz"
+sudo install -m755 storage-lock-cli /usr/local/bin/
+storage-lock-cli --version
+```
+
+归档里已经带上 `skills/` 目录，Agent 用户可以直接：
+
+```bash
+mkdir -p ~/.claude/skills && cp -r skills/* ~/.claude/skills/
+```
+
+**从源码安装**（需要 Go 1.26+，见 go.mod）：
+
+```bash
+go install github.com/storage-lock/storage-lock-cli@latest
+```
+
+> 二进制用 `CGO_ENABLED=0` 构建，SQLite 后端使用纯 Go 驱动
+> (`modernc.org/sqlite`)，不依赖系统 C 库。
+
 ## 存储后端
 
 CLI 本身是客户端工具，需要一个共享的存储后端来保证跨进程/跨机器的原子性。
