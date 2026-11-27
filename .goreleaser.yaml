@@ -69,9 +69,12 @@ checksum:
   algorithm: sha256
 
 # Homebrew 分发。v2 起 `brews` 已弃用，改用 cask。
-# tap 仓库不存在时会自动跳过（skip_upload: auto），不阻塞发版。
 homebrew_casks:
   - name: storage-lock-cli
+    # skip_upload: true —— tap 仓库（storage-lock/homebrew-tap）尚未创建，
+    # auto 只跳过"已存在的 tap 非公开"之类情况，对 404 不会兜住，
+    # 会让整次发版在构建全部成功之后失败。等 tap 建好再改回 auto。
+    skip_upload: true
     repository:
       owner: storage-lock
       name: homebrew-tap
@@ -79,7 +82,6 @@ homebrew_casks:
     directory: Casks
     homepage: https://github.com/storage-lock/storage-lock-cli
     description: "Distributed lock and agent-coordination CLI"
-    skip_upload: auto
     binaries:
       - storage-lock-cli
     hooks:
