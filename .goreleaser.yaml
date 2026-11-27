@@ -13,8 +13,8 @@ project_name: storage-lock-cli
 
 before:
   hooks:
-    # 走脚本而不是裸 `go mod tidy`：需要显式设置 GOPROXY。
-    # 默认的 direct 会在 CI 上为每个依赖单独 git ls-remote，不稳定且失败即中止。
+    # 走脚本而不是裸 `go mod tidy`：before.hooks 无法设置环境变量，而这里
+    # 必须显式带 GOPRIVATE（依赖多为私有仓库）与 GOPROXY。
     - ./scripts/prepare-release.sh
 
 builds:
