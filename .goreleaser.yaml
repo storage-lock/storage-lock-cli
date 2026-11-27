@@ -65,7 +65,20 @@ archives:
       # skills/ 是 git 子模块（go-storage-lock-skills），内容直接平铺在该目录下。
       # 打包进去的价值：用户解压后即可把技能定义拷进 ~/.claude/skills，
       # 不必再去 clone 另一个仓库。
-      - skills/**
+      # 排除子模块的 .git：它会把几个 MB 的 Git 元数据塞进发行物，
+      # 而且对用户毫无用处（用户要的是可拷贝的 SKILL.md）。
+      # 逐个列出要打包的技能文件，而不是 skills/**。
+      # 原因：子模块目录里有 .git（gitfile），通配会把 Git 元数据一起塞进发行物；
+      # goreleaser v2 的 archive.files 又不支持排除语法，逐个列反而最稳。
+      - skills/README.md
+      - skills/CHANGELOG.md
+      - skills/LICENSE
+      - skills/smoke-test.sh
+      - skills/storage-lock-lock/SKILL.md
+      - skills/storage-lock-with-lock/SKILL.md
+      - skills/storage-lock-leader-election/SKILL.md
+      - skills/storage-lock-semaphore/SKILL.md
+      - skills/storage-lock-coordination/SKILL.md
 
 checksum:
   name_template: checksums.txt
