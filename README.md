@@ -8,7 +8,7 @@
 
 ```bash
 # 版本号换成 Releases 页面上的最新版本；平台可选 linux/darwin/windows 与 amd64/arm64
-VER=v0.2.3
+VER=v0.2.4
 curl -fsSLO "https://github.com/storage-lock/storage-lock-cli/releases/download/$VER/storage-lock-cli_${VER#v}_linux_amd64.tar.gz"
 curl -fsSLO "https://github.com/storage-lock/storage-lock-cli/releases/download/$VER/checksums.txt"
 sha256sum -c checksums.txt --ignore-missing
@@ -30,7 +30,7 @@ go install github.com/storage-lock/storage-lock-cli@latest
 ```
 
 > 二进制用 `CGO_ENABLED=0` 构建，SQLite 后端使用纯 Go 驱动
-> (`modernc.org/sqlite`)，不依赖系统 C 库。
+> (`modernc.org/sqlite`)，不依赖系统 C 库，Linux/macOS/Windows 均可直接用。
 
 ## 存储后端
 
