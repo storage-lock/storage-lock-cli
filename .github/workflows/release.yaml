@@ -16,13 +16,9 @@ jobs:
   goreleaser:
     runs-on: ubuntu-latest
     env:
-      # 大部分 storage-lock/* 依赖是私有仓库，模块代理上不存在，
-      # 必须用带凭据的 git 直连。GOPRIVATE 让 go 跳过代理与校验和库，
-      # 由下面的 git -> url.insteadOf 注入凭证。
-      GOPRIVATE: github.com/storage-lock/*
-      GONOSUMDB: github.com/storage-lock/*
-      GONOSUMCHECK: "1"
-      # 兜底：公开依赖仍走代理，避免直连时偶发失败导致整体失败。
+      # 所有依赖都是公开仓库，走公共代理即可。
+      # （此前依赖是私有的，需要 GOPRIVATE + token 直连；转公开后已移除，
+      #   不再在 CI 里保留多余的长期凭据。）
       GOPROXY: https://proxy.golang.org,direct
     steps:
       - uses: actions/checkout@v4
@@ -37,18 +33,6 @@ jobs:
         with:
           go-version-file: go.mod
           cache: true
-
-      # 用仓库 secret 给 git 配好私有模块的读取凭证。
-      # 不把 token 写进 URL（那样会留在 .git/config 与日志里），
-      # 用 url.insteadOf + GIT_ASKPASS 更干净。
-      - name: Configure private module access
-        env:
-          TOKEN: ${{ secrets.GOPRIVATE_GITHUB_TOKEN }}
-        run: |
-          git config --global url."https://github.com/".insteadOf "git@github.com:"
-          git config --global "url.https://x-access-token:${TOKEN}@github.com/.insteadOf" "https://github.com/"
-          # 让 go 用 git 读私有仓库时不再尝试交互式认证
-          git config --global advice.detachedHead false
 
       # 发布前先跑一遍测试：宁可发不出去，也不发一个装不上的版本。
       - name: Test
