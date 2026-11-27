@@ -251,7 +251,35 @@ docker run -d -p 6379:6379 --name redis redis:latest
 
 如果你的 Agent 需要跨不同网络环境协作（例如云端 CI/CD、远程服务器、多地域），建议使用云端存储后端。
 
-### 推荐方案：Firebase Realtime Database（零配置，免费）
+### 推荐方案：`--storage=cloud`（零配置，免注册）
+
+`cloud` 连的是本生态自建的 remote-storage 服务，比 Firebase 更适合锁：
+服务端对每次写做真正的原子 CAS，并给出**统一的服务端时钟**（租约过期判断
+不能各机器各算各的）。
+
+```bash
+# 不填 DSN 即可（内置公共地址），首次调用自动领取租户凭据
+storage-lock-cli --storage=cloud skills lock --id=my-lock --ttl=30s
+
+# 自建服务端或临时指定别的地址
+storage-lock-cli --storage=cloud --dsn=https://locks.example.com skills lock --id=my-lock --ttl=30s
+```
+
+**多租户隔离**：服务端签发租户 secret，客户端落盘到
+`~/.config/storage-lock/tenant-<身份>-<哈希>.secret`（0600）。所有 lock id 落库前
+加 `tenant/<tenant_id>/` 前缀，List 只返回本租户记录；不同用户的同名锁互不可见。
+**不要删这份 secret**：丢了就回不到原租户，之前建的锁会全部不可见。
+
+**地址会变**：老地址还在时服务端 308 重定向；老地址下线时客户端拉签名的
+发现文档（`STORAGE_LOCK_DISCOVERY_URL` 可指向自建位置），用首次接触时钉住的
+公钥验签后切换到新地址。冒充者自称同一身份会被拒绝，secret 不会外泄。
+
+### 不推荐：Firebase Realtime Database
+
+`--storage=firebase` 仍注册着，但**它不具备原子 CAS 与可信时间**，
+因此不被声明为可用于锁的存储：并发下两个 Agent 可能同时"成功"获取同一把锁，
+而客户端不会报错——这比直接失败危险得多。单机演示可以用，
+用于真实互斥请选 `cloud` / redis / mariadb 这类满足 CAS 的后端。
 
 **为什么推荐 Firebase**：
 - ✅ 免费额度：100K 连接/天，1GB 存储

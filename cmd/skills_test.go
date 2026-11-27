@@ -168,3 +168,72 @@ func TestEmitContract(t *testing.T) {
 		t.Error("失败结果必须带 error 文本")
 	}
 }
+
+// TestKvFlags 验证 --meta 的解析：引号容易出错的形状都要能给出可读错误。
+func TestKvFlags(t *testing.T) {
+	got, err := kvFlags([]string{"task=42", "repo=api", "note=a=b"})
+	if err != nil {
+		t.Fatalf("合法输入不应报错: %v", err)
+	}
+	if got["task"] != "42" || got["repo"] != "api" || got["note"] != "a=b" {
+		t.Fatalf("解析结果不对: %v", got)
+	}
+	if _, err := kvFlags([]string{"no-equals"}); err == nil {
+		t.Fatal("缺少 = 应报错")
+	}
+	if _, err := kvFlags([]string{"=value"}); err == nil {
+		t.Fatal("空 key 应报错")
+	}
+}
+
+// TestParseCAS 验证 --cas 的 EXPECT=NEW 解析。
+func TestParseCAS(t *testing.T) {
+	expect, next, err := parseCAS("7=8")
+	if err != nil || expect != 7 || next != 8 {
+		t.Fatalf("parseCAS(7=8) = %d,%d,%v", expect, next, err)
+	}
+	expect, next, err = parseCAS("-3=0")
+	if err != nil || expect != -3 || next != 0 {
+		t.Fatalf("负数应支持: %d,%d,%v", expect, next, err)
+	}
+	for _, bad := range []string{"7", "a=8", "7=b", "5=5"} {
+		if _, _, err := parseCAS(bad); err == nil {
+			t.Fatalf("parseCAS(%q) 应报错", bad)
+		}
+	}
+}
+
+// TestWaitDuration 验证"等待时长"可以为 0 且不接受负数。
+func TestWaitDuration(t *testing.T) {
+	if d, err := waitDuration(""); err != nil || d != 0 {
+		t.Fatalf("空串应返回 0, nil，得到 %v, %v", d, err)
+	}
+	if d, err := waitDuration("200ms"); err != nil || d != 200*time.Millisecond {
+		t.Fatalf("短时长应被接受（与 TTL 的 3s 下限无关），得到 %v, %v", d, err)
+	}
+	if _, err := waitDuration("-1s"); err == nil {
+		t.Fatal("负时长应报错")
+	}
+}
+
+// TestOwnerOrDefault 保证生成的 owner 非空且每次都不同——
+// owner 是后续 ack/unlock 的唯一凭据，重复会让两个 Agent 争抢同一份执行权。
+func TestOwnerOrDefault(t *testing.T) {
+	if ownerOrDefault("mine") != "mine" {
+		t.Fatal("显式 owner 不应被改写")
+	}
+	a, b := ownerOrDefault(""), ownerOrDefault("")
+	if a == "" || b == "" {
+		t.Fatal("应生成非空 owner")
+	}
+	if a == b {
+		t.Fatal("两次生成不应相同")
+	}
+}
+
+// TestLockMode 保证读写模式字符串稳定：Agent 按 mode 分支，不能中途改名。
+func TestLockMode(t *testing.T) {
+	if lockMode(true) != "read" || lockMode(false) != "write" {
+		t.Fatal("mode 字符串必须稳定为 read/write")
+	}
+}

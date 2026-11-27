@@ -6,8 +6,8 @@ import (
 	"time"
 
 	"github.com/spf13/cobra"
-	coordination "github.com/storage-lock/go-storage-lock-coordination"
 	storage_lock "github.com/storage-lock/go-storage-lock"
+	coordination "github.com/storage-lock/go-storage-lock-coordination"
 )
 
 var (

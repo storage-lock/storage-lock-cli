@@ -11,6 +11,7 @@ import (
 	"github.com/spf13/cobra"
 	storage "github.com/storage-lock/go-storage"
 	storage_lock "github.com/storage-lock/go-storage-lock"
+	coordination "github.com/storage-lock/go-storage-lock-coordination"
 )
 
 // skillsCmd 是给 Agent 用的锁协调命令组。
@@ -29,7 +30,14 @@ The storage backend is selected by the global --storage / --dsn flags.
   lock / renew / unlock / status   single-key lease lock
   with-lock                        hold a lock while running a child process
   leader-election                  one-shot or held leadership campaign
-  semaphore / semaphore-release    rate limiting permits`,
+  semaphore / semaphore-release    limit how many agents run at once
+  rate-limit                       limit how many calls per second
+  rw-lock                          shared/exclusive lock (readers don't block each other)
+  once                             run a task exactly once across the cluster
+  queue                            visibility-timeout work queue
+  delayed-queue                    work queue with per-item delay (backoff retries)
+  counter                          distributed atomic counter
+  observe                          one-shot snapshot of all locks`,
 }
 
 // skillResult 是所有 skills 子命令的输出契约。
@@ -48,6 +56,41 @@ type skillResult struct {
 	Waiters        int             `json:"waiters,omitempty"`
 	Message        string          `json:"message,omitempty"`
 	Error          string          `json:"error,omitempty"`
+
+	// ItemID / Payload 用于队列类命令：Agent 需要把 id 带回去做 ack。
+	ItemID  string `json:"item_id,omitempty"`
+	Payload string `json:"payload,omitempty"`
+	// ReadyAt 是延迟队列元素的可见时刻（RFC3339）。
+	ReadyAt string `json:"ready_at,omitempty"`
+
+	// observe 的分组计数：Agent 用它们判断"现在该不该动手"，
+	// 比逐把查状态便宜得多。
+	Total int `json:"total,omitempty"`
+	Held  int `json:"held_count,omitempty"`
+	Free  int `json:"free_count,omitempty"`
+	Stale int `json:"stale,omitempty"`
+
+	// 计数 / 数值类命令的结果。
+	Value     int64  `json:"value,omitempty"`
+	SetValue  *int64 `json:"set_value,omitempty"`
+	SetResult bool   `json:"set_result,omitempty"`
+	Tokens    int64  `json:"tokens,omitempty"`
+
+	// Items 是 peek / list 类命令的明细。
+	Items []coordination.PendingItem `json:"items,omitempty"`
+	// Locks 是 observe 的逐锁明细；与 Items（队列元素）分开，
+	// 避免两类结构挤在同一个字段里让调用方不得不猜类型。
+	Locks []lockView `json:"locks,omitempty"`
+
+	// 读锁模式标记：status 里区分 shared / exclusive。
+	ReadLock bool     `json:"read_lock,omitempty"`
+	Mode     string   `json:"mode,omitempty"`
+	Meta     []string `json:"meta,omitempty"`
+
+	// WriteIntentOwner / WriteIntentAge 暴露"有人在排队等写"，
+	// 让只读 Agent 知道现在不该再做长任务，否则会阻塞写者。
+	WriteIntentOwner string `json:"write_intent_owner,omitempty"`
+	WriteIntentAge   string `json:"write_intent_age,omitempty"`
 }
 
 // emit 把结果写成一行 JSON。返回值用于让 RunE 返回非 nil 错误以设置退出码。

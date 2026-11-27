@@ -13,11 +13,12 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version: '1.23'
+          go-version-file: go.mod
 
       # 只用 go.mod 里声明的已发布依赖，与下游 go get 拿到的形态一致。
-      - name: Build
-        run: go build ./...
+      # 关闭 CGO：发行版二进制就是这样构建的，CI 必须在同一形态下验证。
+      - name: Build (CGO off)
+        run: CGO_ENABLED=0 go build ./...
 
       - name: Vet
         run: go vet ./...

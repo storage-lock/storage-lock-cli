@@ -30,6 +30,11 @@ var rootCmd = &cobra.Command{
 	Use:   "storage-lock-cli",
 	Short: "storage-lock command line tool",
 	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
+		// 纯信息型命令不该要求存储后端：`version` 要在"什么都还没配"时可用，
+		// 否则新机器上第一步就跑不起来，排障时也拿不到版本号。
+		if noStorageNeeded(cmd) {
+			return nil
+		}
 		if storageName == "" {
 			return fmt.Errorf("--storage is required (supported: %s)", strings.Join(creater.ListSupportStorageName(), ", "))
 		}
@@ -49,6 +54,18 @@ var rootCmd = &cobra.Command{
 		closeRootStorage()
 	},
 	Run: func(cmd *cobra.Command, args []string) { _ = cmd.Help() },
+}
+
+// noStorageNeeded 判断该命令是否与存储无关。
+//
+// 用命令名而不是 flag：把这些命令列在这里是显式的，
+// 新增信息型命令时忘了登记会立刻暴露成"要求 --storage"，不会被静默放过。
+func noStorageNeeded(cmd *cobra.Command) bool {
+	switch cmd.Name() {
+	case "version", "help", "completion":
+		return true
+	}
+	return false
 }
 
 func closeRootStorage() {

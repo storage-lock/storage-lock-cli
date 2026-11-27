@@ -10,7 +10,25 @@ CLI 本身是客户端工具，需要一个共享的存储后端来保证跨进�
 
 - **单机多 Agent**：SQLite3（免费，零依赖）
 - **局域网多 Agent**：Redis/MariaDB/PostgreSQL（自建）
-- **云端多 Agent**：Firebase Realtime Database（推荐，免配置，免费额度大）
+- **云端多 Agent**：`--storage=cloud`（推荐，零配置，免注册）
+
+`cloud` 是给 Agent 用的默认后端：不填 DSN，首次调用自动向服务端领取租户凭据，
+之后本机所有 Agent 共享同一命名空间：
+
+```bash
+storage-lock-cli --storage=cloud skills lock --id=deploy --ttl=30s
+```
+
+它同时解决了"服务端地址会变"这件事：
+
+- 老地址还在 → 服务端 308 到新地址，客户端自动跟随；
+- 老地址彻底下线 → 客户端拉**签名发现文档**（内置托管在 jsDelivr/GitHub，
+  也可用 `STORAGE_LOCK_DISCOVERY_URL` 指向自建位置），验签通过后切换并写回
+  `~/.config/storage-lock/endpoints.json`；
+- 发现文档被篡改或冒充者自称同一身份 → 客户端用首次接触时**钉住的公钥**验签，
+  验不过就明确报错，绝不把 secret 发出去。
+
+所以换域名不需要重发 CLI、也不需要人工改每台机器的配置。
 
 详细指南见 [STORAGE_BACKENDS.md](STORAGE_BACKENDS.md)，包含本地/自建/云端存储后端的完整对比和使用方法。
 
@@ -50,10 +68,17 @@ storage-lock-cli --storage mysql --dsn "$DSN" unlock jobs:daily --owner deploy-2
 
 `skills` 子命令组专为 Claude Code Agent 设计，提供 JSON 契约便于脚本调用：
 
-- `skills lock|renew|unlock|status`：无状态租约锁
+- `skills lock|renew|unlock|status`：无状态租约锁（`status` 含 owner/令牌/剩余租期/等待者/元数据）
 - `skills with-lock --id -- [CMD...]`：持锁运行子命令，看门狗续租
 - `skills leader-election [--hold]`：领导者选举
-- `skills semaphore|semaphore-release`：固定容量信号量
+- `skills semaphore|semaphore-release`：限制"同时有几个"在跑
+- `skills rate-limit`：限制"每秒能调几次"（令牌桶）
+- `skills rw-lock`：读写锁，多个读者可与一个写者互斥共存
+- `skills once`：全区只允许成功执行一次的任务（部署/迁移）
+- `skills queue`：可见性超时队列，消费者崩溃后任务自动回到队列
+- `skills delayed-queue`：带延迟的队列，用于退避重试（不需要 sleep）
+- `skills counter`：分布式原子计数器（含 CAS）
+- `skills observe`：一次 List 拿到全局锁快照与僵尸锁统计
 
 完整文档见 [go-storage-lock-skills](https://github.com/storage-lock/go-storage-lock-skills)。
 

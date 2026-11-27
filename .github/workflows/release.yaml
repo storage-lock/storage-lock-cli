@@ -1,0 +1,40 @@
+name: Release
+
+# 打 tag（v*）即发版：构建全平台二进制、生成校验和、创建 GitHub Release。
+#
+# 版本号只以 tag 为准，二进制内的版本信息由 goreleaser 用 -ldflags 注入，
+# 因此"下载到的二进制自报的版本"必然等于 tag。
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  goreleaser:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # goreleaser 的 changelog 依赖完整 git 历史与 tag
+          fetch-depth: 0
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      # 发布前先跑一遍测试：宁可发不出去，也不发一个装不上的版本。
+      - name: Test
+        run: go test ./...
+
+      - name: GoReleaser
+        uses: goreleaser/goreleaser-action@v6
+        with:
+          distribution: goreleaser
+          version: "~> v2"
+          args: release --clean
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

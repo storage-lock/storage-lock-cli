@@ -107,6 +107,12 @@ func init() {
 	})
 	// sqlite3 适合单机多进程，无需外部服务
 	register(sqlite3_storage.SqliteStorageName, func(ctx context.Context, dsn string) (storage.Storage, error) {
+		// 保证 "sqlite3" 这个名字在运行时确实有驱动可用（详见 sqlite3_driver.go）。
+		// 发行版是 CGO_ENABLED=0 构建的，只能靠纯 Go 驱动。
+		_, dsn, err := sqliteDSN(dsn)
+		if err != nil {
+			return nil, err
+		}
 		connectionManager, err := sqlite3_storage.NewSqlite3ConnectionManager(dsn)
 		if err != nil {
 			return nil, err

@@ -1,0 +1,117 @@
+# goreleaser 配置：产出可跨平台下载安装的 storage-lock-cli 二进制。
+#
+# 设计要点：
+#  1. 关闭 CGO。开启时 sqlite3 后端需要一个目标平台的 C 编译器，
+#     交叉编译几乎做不成；关掉后 sqlite3 后端会退回到纯 Go 实现
+#     （mattn/go-sqlite3 在没有 CGO 时不可用，见 README 的说明）。
+#  2. 版本信息全部走 -ldflags 注入，二进制里不写死版本号。
+#  3. 校验和 + 签名材料是"能放心下载"的前提：用户拿到二进制后能自查。
+
+version: 2
+
+project_name: storage-lock-cli
+
+before:
+  hooks:
+    - go mod tidy
+
+builds:
+  - id: cli
+    main: .
+    binary: storage-lock-cli
+    env:
+      - CGO_ENABLED=0
+    flags:
+      - -trimpath
+    ldflags:
+      - -s -w
+      - -X github.com/storage-lock/storage-lock-cli/cmd.version={{.Version}}
+      - -X github.com/storage-lock/storage-lock-cli/cmd.commit={{.Commit}}
+      - -X github.com/storage-lock/storage-lock-cli/cmd.buildDate={{.Date}}
+    goos:
+      - linux
+      - darwin
+      - windows
+    goarch:
+      - amd64
+      - arm64
+    # 32 位只给 linux：armv7 的设备（树莓派等）值得支持，
+    # 但 CI 上多一套组合只是徒增构建时间。
+    goarm:
+      - 7
+    ignore:
+      - goos: darwin
+        goarch: arm64
+        goarm: 7
+      - goos: windows
+        goarch: arm64
+        goarm: 7
+
+archives:
+  - id: default
+    formats: [tar.gz]
+    name_template: >-
+      {{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}
+      {{- if .Arm }}v{{ .Arm }}{{ end }}
+    format_overrides:
+      - goos: windows
+        formats: [zip]
+    files:
+      - LICENSE
+      - README.md
+      - STORAGE_BACKENDS.md
+      - skills/**
+
+checksum:
+  name_template: checksums.txt
+  algorithm: sha256
+
+# Homebrew 分发。v2 起 `brews` 已弃用，改用 cask。
+# tap 仓库不存在时会自动跳过（skip_upload: auto），不阻塞发版。
+homebrew_casks:
+  - name: storage-lock-cli
+    repository:
+      owner: storage-lock
+      name: homebrew-tap
+      branch: main
+    directory: Casks
+    homepage: https://github.com/storage-lock/storage-lock-cli
+    description: "Distributed lock and agent-coordination CLI"
+    skip_upload: auto
+    binaries:
+      - storage-lock-cli
+    hooks:
+      post:
+        install: |
+          if OS.mac?
+            system_command "/usr/bin/xattr", args: ["-dr", "com.apple.quarantine", "#{staged_path}/storage-lock-cli"]
+          end
+
+changelog:
+  use: github
+  format: "{{ .Message }}"
+
+release:
+  github:
+    owner: storage-lock
+    name: storage-lock-cli
+  draft: false
+  prerelease: auto
+  footer: |
+    ## 安装
+
+    ```bash
+    # 直接下载对应平台的归档（见下方 Assets），解压后放入 PATH
+    tar -xzf storage-lock-cli_{{ .Version }}_linux_amd64.tar.gz
+    sudo install -m755 storage-lock-cli /usr/local/bin/
+
+    # 或源码安装（需要 Go 1.23+）
+    go install github.com/storage-lock/storage-lock-cli@{{ .Version }}
+    ```
+
+    校验：
+    ```bash
+    sha256sum -c checksums.txt
+    ```
+
+    Agent 技能定义见 [go-storage-lock-skills](https://github.com/storage-lock/go-storage-lock-skills)。
