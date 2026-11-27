@@ -109,7 +109,7 @@ release:
     tar -xzf storage-lock-cli_{{ .Version }}_linux_amd64.tar.gz
     sudo install -m755 storage-lock-cli /usr/local/bin/
 
-    # 或源码安装（需要 Go 1.23+）
+    # 或源码安装（需要 Go 1.26+，见 go.mod 的 go 指令）
     go install github.com/storage-lock/storage-lock-cli@{{ .Version }}
     ```
 
