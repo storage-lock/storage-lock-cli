@@ -15,6 +15,10 @@ permissions:
 jobs:
   goreleaser:
     runs-on: ubuntu-latest
+    env:
+      # 显式指定模块代理：默认的 direct 直连 git 在 CI 上会因网络不稳定而失败，
+      # 且没有任何重试。代理失败时自动回落 direct。
+      GOPROXY: https://proxy.golang.org,direct
     steps:
       - uses: actions/checkout@v4
         with:
