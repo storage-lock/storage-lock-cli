@@ -1,2 +1,6 @@
 # 构建产物
 storage-lock-cli
+
+# goreleaser 输出目录：本地快照构建会生成，绝不能进仓库
+# （goreleaser 发布时要求工作区干净，dist 残留会导致 "git is in a dirty state"）
+dist/
