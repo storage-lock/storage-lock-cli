@@ -62,6 +62,9 @@ archives:
       - LICENSE
       - README.md
       - STORAGE_BACKENDS.md
+      # skills/ 是 git 子模块（go-storage-lock-skills），内容直接平铺在该目录下。
+      # 打包进去的价值：用户解压后即可把技能定义拷进 ~/.claude/skills，
+      # 不必再去 clone 另一个仓库。
       - skills/**
 
 checksum:

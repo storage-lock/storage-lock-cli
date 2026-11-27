@@ -29,6 +29,9 @@ jobs:
         with:
           # goreleaser 的 changelog 依赖完整 git 历史与 tag
           fetch-depth: 0
+          # skills/ 是子模块，归档里要把它一并打进去（Agent 拿到二进制就能用技能定义）。
+          # 默认 checkout 不会填充子模块，导致归档缺整个 skills 目录。
+          submodules: recursive
 
       - uses: actions/setup-go@v5
         with:

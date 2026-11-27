@@ -13,6 +13,8 @@ jobs:
       GOPROXY: https://proxy.golang.org,direct
     steps:
       - uses: actions/checkout@v4
+        with:
+          submodules: recursive
 
       - name: Set up Go
         uses: actions/setup-go@v5
